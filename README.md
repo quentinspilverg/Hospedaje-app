@@ -12,3 +12,5 @@
 - Login con Supabase Auth
 - Vista "Inicio": estado de las 5 habitaciones, editable
 - Calendario, Reservas, Gastos, Resumen: pendientes (próximos pasos)
+
+actualizado
