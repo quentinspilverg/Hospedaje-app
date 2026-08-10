@@ -11,7 +11,7 @@ function pad(n) {
 }
 
 function fmt(n) {
-  return Number(n || 0).toLocaleString('es-CL')
+  return Number(n || 0).toLocaleString('es-CL', { maximumFractionDigits: 0 })
 }
 
 // Noches de una reserva que caen dentro de un mes dado (year, monthIndex)

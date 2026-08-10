@@ -88,7 +88,7 @@ export default function Gastos() {
   }
 
   async function handleDelete(g) {
-    if (!confirm(`¿Estás seguro de eliminar "${categoriaLabel(g.categoria)}" ($${Number(g.monto).toLocaleString('es-CL')})?`)) return
+    if (!confirm(`¿Estás seguro de eliminar "${categoriaLabel(g.categoria)}" ($${Number(g.monto).toLocaleString('es-CL', { maximumFractionDigits: 0 })})?`)) return
     const { error } = await supabase.from('gastos').delete().eq('id', g.id)
     if (error) setError('No se pudo eliminar.')
     else load()

@@ -8,7 +8,7 @@ function formatFecha(iso) {
 }
 
 function fmt(n) {
-  return Number(n || 0).toLocaleString('es-CL')
+  return Number(n || 0).toLocaleString('es-CL', { maximumFractionDigits: 0 })
 }
 
 export default function Reservas() {
