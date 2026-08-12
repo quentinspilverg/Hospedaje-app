@@ -7,6 +7,8 @@ const MESES = [
   'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre',
 ]
 
+const DIAS_SEMANA = ['domingo', 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado']
+
 const ICONOS = {
   arriendo: '🏠',
   agua: '💧',
@@ -39,6 +41,37 @@ function pad(n) {
 
 function fechaISO(d) {
   return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`
+}
+
+// Calcula el mensaje y color según cuántos días faltan (o pasaron) para la fecha del gasto
+function estadoPago(fechaISOStr, estado) {
+  if (estado === 'pagado') {
+    return { texto: '✅ Pagado', clase: 'badge-verde' }
+  }
+
+  const hoy = new Date()
+  hoy.setHours(0, 0, 0, 0)
+
+  const [y, m, d] = fechaISOStr.split('-').map(Number)
+  const fechaVenc = new Date(y, m - 1, d)
+
+  const diffDias = Math.round((fechaVenc - hoy) / 86400000)
+
+  if (diffDias > 1) {
+    return { texto: `🟠 ${diffDias} días para pagar`, clase: 'badge-naranjo' }
+  }
+  if (diffDias === 1) {
+    const diaSemana = DIAS_SEMANA[fechaVenc.getDay()]
+    return { texto: `🟠 Debes pagar mañana ${diaSemana}`, clase: 'badge-naranjo' }
+  }
+  if (diffDias === 0) {
+    return { texto: '🔴 Pagar hoy', clase: 'badge-rojo' }
+  }
+  const diasVencido = Math.abs(diffDias)
+  return {
+    texto: `🔴 Debiste pagar hace ${diasVencido} día${diasVencido === 1 ? '' : 's'}`,
+    clase: 'badge-rojo',
+  }
 }
 
 const INICIO_PROYECTO = { y: 2026, m: 6 } // Julio 2026
@@ -176,26 +209,29 @@ export default function Gastos() {
       )}
 
       <div className="reserva-list">
-        {gastosFiltrados.map((g) => (
-          <div key={g.id} className="reserva-item">
-            <div className="reserva-info" onClick={() => openEdit(g)}>
-              <div className="reserva-top">
-                <span className="reserva-huesped">{ICONOS[g.categoria] || '📦'} {categoriaLabel(g.categoria)}</span>
-                <span className="reserva-precio">${Number(g.monto).toLocaleString('es-CL')}</span>
+        {gastosFiltrados.map((g) => {
+          const estado = estadoPago(g.fecha, g.estado)
+          return (
+            <div key={g.id} className="reserva-item">
+              <div className="reserva-info" onClick={() => openEdit(g)}>
+                <div className="reserva-top">
+                  <span className="reserva-huesped">{ICONOS[g.categoria] || '📦'} {categoriaLabel(g.categoria)}</span>
+                  <span className="reserva-precio">${Number(g.monto).toLocaleString('es-CL', { maximumFractionDigits: 0 })}</span>
+                </div>
+                <div className="reserva-meta">
+                  {g.fecha} · {g.tipo} {g.proveedor ? `· ${g.proveedor}` : ''}
+                </div>
+                <div style={{ marginTop: 6 }}>
+                  <span className={`badge ${estado.clase}`}>{estado.texto}</span>
+                </div>
               </div>
-              <div className="reserva-meta">
-                {g.fecha} · {g.tipo} {g.proveedor ? `· ${g.proveedor}` : ''}
-              </div>
-              <div style={{ marginTop: 6 }}>
-                <span className="badge">{g.estado === 'pagado' ? '✅ Pagado' : '🕓 Pendiente'}</span>
+              <div className="row-actions">
+                <button className="icon-btn" onClick={() => openEdit(g)} aria-label="Editar">✏️</button>
+                <button className="icon-btn danger" onClick={() => handleDelete(g)} aria-label="Eliminar">🗑️</button>
               </div>
             </div>
-            <div className="row-actions">
-              <button className="icon-btn" onClick={() => openEdit(g)} aria-label="Editar">✏️</button>
-              <button className="icon-btn danger" onClick={() => handleDelete(g)} aria-label="Eliminar">🗑️</button>
-            </div>
-          </div>
-        ))}
+          )
+        })}
       </div>
 
       <button className="fab" onClick={openNew} aria-label="Nuevo gasto">

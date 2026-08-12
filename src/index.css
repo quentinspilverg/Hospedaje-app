@@ -729,3 +729,21 @@ button, select, input {
   color: var(--color-text-muted);
   cursor: pointer;
 }
+
+.badge-verde {
+  color: var(--status-ocupada);
+  border-color: var(--status-ocupada);
+  font-weight: 600;
+}
+
+.badge-naranjo {
+  color: var(--status-limpieza);
+  border-color: var(--status-limpieza);
+  font-weight: 600;
+}
+
+.badge-rojo {
+  color: var(--status-mantenimiento);
+  border-color: var(--status-mantenimiento);
+  font-weight: 600;
+}
